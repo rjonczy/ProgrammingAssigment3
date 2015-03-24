@@ -1,5 +1,7 @@
-best <- function(state, outcome) {
- 
+rankall <- function(state, outcome, num) {
+    
+    s <- state
+    
     # lowest 30-day mortality rate
     #    2 - hospital name
     #    7 - state
@@ -8,14 +10,21 @@ best <- function(state, outcome) {
     #   23 - preumonia
     
     data <- read.csv("outcome-of-care-measures.csv", colClasses="character")
-       
+    
     # check if passed outcome param is valid
     if(!outcome %in% c("heart attack", "heart failure", "pneumonia"))
         stop("invalid outcome")
     
     # check if passed state is valid        
     if(!state %in% unique(data[,7]))
-        stop("invalid state")   
+        stop("invalid state")
+    
+    # return NA if num is higher than amount of hospitals in a given state
+    if(class(num) == 'numeric') {
+        if(num > nrow(data[data$State == s,])) {
+            return(NA)
+        }            
+    }
     
     # convert to numeric columns: 11, 17, 23
     data[,11] <- as.numeric(data[,11])
@@ -40,13 +49,27 @@ best <- function(state, outcome) {
     
     # subset for given state and remove NAa
     #result <- subset(result, !is.na(result$mortality) & result$state == state)
-    s <- state
+    
     result <- subset(result, result$state == s & !is.na(result$mortality))
     
     # sort in ascending order by mortality than hospital name
     index <- with(result, order(mortality, hname))
     result <- result[index,]
+    
+    
     # return
-    result[1,'hname']   
+    if(class(num) == 'numeric')
+        return(result[num, 'hname'])    
+    
+    if(class(num) == 'character') {
+        
+        if(num == 'best')            
+            return(result[1, 'hname'])
+        
+        if(num == 'worst') 
+            return(result[nrow(result), 'hname'])
+    }
+    
+    
     
 }
