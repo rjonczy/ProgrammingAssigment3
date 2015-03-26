@@ -56,7 +56,7 @@ rankall <- function(outcome, num = 'best') {
 
     # return from sorted data.frames idx element
     r <- lapply( resultList, function(x, num) { 
-  
+        
         # set idx as index to be returned
         if(class(num) == 'numeric') {
             idx <- num
@@ -68,7 +68,7 @@ rankall <- function(outcome, num = 'best') {
                 idx <- 1
             
             if(num == 'worst') 
-                idx <- length(x)
+                idx <- nrow(x)
         }        
         
         return( x[idx, c(2, 1)] ) 
